@@ -154,7 +154,6 @@ class Experiment:
         if not self.isalive():
             print('ns3ai_utils: Subprocess died very early')
             exit(1)
-        signal.signal(signal.SIGINT, sigint_handler)
         return self.msgInterface
 
     def kill(self):

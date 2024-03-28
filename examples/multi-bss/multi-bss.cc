@@ -794,7 +794,7 @@ PrintPythonPlotCSV(std::string filename)
         outFile << "box," << box.xMax - box.xMin << "," << box.yMax - box.yMin << "," << rowCount
                 << std::endl;
     }
-    double maxDistance;
+    double maxDistance = 0;
     if (appType != "setup-done")
     { // Formula to draw radius of circle
         double max_loss = -(ccaSensitivity - txPower);

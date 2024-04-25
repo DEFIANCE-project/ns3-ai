@@ -90,35 +90,6 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
         self.newStateRx = False
         return True
 
-    def reset(self, seed=None, options=None):
-        if not self.envDirty:
-            obs = self.get_obs()
-            return obs, {}
-
-        # not using self.exp.kill() here in order for semaphores to reset to initial state
-        if not self.gameOver:
-            self.rx_env_state()
-            self.send_close_command()
-            self.exp.proc.wait(2)
-
-        self.msgInterface = None
-        self.newStateRx = False
-        self.obsData = None
-        self.reward = 0
-        self.gameOver = False
-        self.gameOverReason = None
-        self.extraInfo = None
-
-        self.msgInterface = self.exp.run(show_output=True)
-        self.initialize_env()
-        # get first observations
-        self.rx_env_state()
-        self.envDirty = False
-
-        obs = self.get_obs()
-        return obs, {}
-
-
     def get_random_action(self):
-        act = self.action_space.sample()
+        act = self.action_space[self.agent_selection].sample()
         return act

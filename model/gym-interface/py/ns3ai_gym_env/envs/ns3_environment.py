@@ -1,3 +1,5 @@
+from typing import Any
+
 import numpy as np
 import gymnasium as gym
 from gymnasium import spaces
@@ -268,7 +270,7 @@ class Ns3Env(gym.Env):
         extraInfo = self.get_extra_info()
         return obs, reward, done, False, extraInfo
 
-    def __init__(self, targetName, ns3Path, ns3Settings=None, shmSize=4096):
+    def __init__(self, targetName, ns3Path, ns3Settings: dict[str, Any] | None = None, shmSize=4096):
         if self._created:
             raise Exception('Error: Ns3Env is singleton')
         self.targetName = targetName

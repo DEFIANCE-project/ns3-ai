@@ -19,6 +19,8 @@
 
 import os
 import subprocess
+from typing import Any
+
 import psutil
 import time
 import signal
@@ -27,14 +29,16 @@ import signal
 SIMULATION_EARLY_ENDING = 0.5   # wait and see if the subprocess is running after creation
 
 
-def get_setting(setting_map):
-    ret = ''
+def get_setting(setting_map: dict[str, Any]) -> str:
+    ret = ""
     for key, value in setting_map.items():
-        ret += ' --{}={}'.format(key, value)
+        ret += f" --{key}"
+        if value:
+            ret += f"={value}"
     return ret
 
 
-def run_single_ns3(path, pname, setting=None, env=None, show_output=False):
+def run_single_ns3(path, pname, setting: dict[str, Any] | None = None, env=None, show_output=False):
     if env is None:
         env = {}
     env.update(os.environ)
@@ -144,7 +148,7 @@ class Experiment:
     # run ns3 script in cmd with the setting being input
     # \param[in] setting : ns3 script input parameters(default : None)
     # \param[in] show_output : whether to show output or not(default : False)
-    def run(self, setting=None, show_output=False):
+    def run(self, setting: dict[str, Any] = None, show_output=False):
         self.kill()
         self.simCmd, self.proc = run_single_ns3(
             './', self.targetName, setting=setting, show_output=show_output)

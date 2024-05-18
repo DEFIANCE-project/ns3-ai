@@ -274,6 +274,7 @@ class Ns3Env(gym.Env):
         if self._created:
             raise Exception('Error: Ns3Env is singleton')
         self.targetName = targetName
+        self.shmSize = shmSize
         self._created = True
         self.exp = Experiment(targetName, ns3Path, py_binding, shmSize=shmSize)
         self.ns3Settings = ns3Settings
@@ -344,7 +345,12 @@ class Ns3Env(gym.Env):
         del self.exp
 
     def __getstate__(self):
-        return {"targetName": self.targetName, "ns3Path": "."}
+        return {
+            "targetName": self.targetName,
+            "ns3Path": ".",
+            "ns3Settings": self.ns3Settings,
+            "shmSize": self.shmSize,
+        }
 
     def __setstate__(self, state):
         if hasattr(self, "exp"):

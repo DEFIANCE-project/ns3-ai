@@ -1,29 +1,38 @@
-import numpy as np
-import gymnasium as gym
-from gymnasium import spaces
+from typing import TYPE_CHECKING, Any, Literal, TypeVar
+
 import messages_pb2 as pb
 import ns3ai_gym_msg_py as py_binding
-from ns3ai_utils import Experiment
-from .ns3_environment import Ns3Env
 from ray.rllib.env.multi_agent_env import MultiAgentEnv
-from typing import Any
+
+from .ns3_environment import Ns3Env
+
+if TYPE_CHECKING:
+    from gymnasium import spaces
+
+T = TypeVar("T")
+
 
 class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
-
-    def __init__(self, targetName, ns3Path, ns3Settings=None, shmSize=4096):
+    def __init__(
+        self, targetName: str, ns3Path: str, ns3Settings: dict[str, Any] | None = None, shmSize: int = 4096
+    ) -> None:
         self.action_space: dict[str, spaces.Space] = {}
         self.observation_space: dict[str, spaces.Space] = {}
+        self.agent_selection: str | None = None
         super().__init__(targetName, ns3Path, ns3Settings, shmSize)
 
-    def initialize_env(self):
-        simInitMsg = pb.MultiAgentSimInitMsg()
+    def initialize_env(self) -> Literal[True]:
+        init_msg = pb.MultiAgentSimInitMsg()
         self.msgInterface.PyRecvBegin()
         request = self.msgInterface.GetCpp2PyStruct().get_buffer()
-        simInitMsg.ParseFromString(request)
+        init_msg.ParseFromString(request)
         self.msgInterface.PyRecvEnd()
 
-        self.action_space = self._create_space(simInitMsg.actSpaces)
-        self.observation_space = self._create_space(simInitMsg.obsSpaces)
+        for agent, space in init_msg.actSpaces.items():
+            self.action_space[agent] = self._create_space(space)
+
+        for agent, space in init_msg.obsSpaces.items():
+            self.action_space[agent] = self._create_space(space)
 
         reply = pb.SimInitAck()
         reply.done = True
@@ -33,63 +42,61 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
 
         self.msgInterface.PySendBegin()
         self.msgInterface.GetPy2CppStruct().size = len(reply_str)
-        self.msgInterface.GetPy2CppStruct().get_buffer_full()[:len(reply_str)] = reply_str
+        self.msgInterface.GetPy2CppStruct().get_buffer_full()[: len(reply_str)] = reply_str
         self.msgInterface.PySendEnd()
         return True
 
-    def rx_env_state(self):
+    def rx_env_state(self) -> None:
         if self.newStateRx:
             return
 
-        envStateMsg = pb.MultiAgentEnvStateMsg()
+        state_msg = pb.MultiAgentEnvStateMsg()
         self.msgInterface.PyRecvBegin()
         request = self.msgInterface.GetCpp2PyStruct().get_buffer()
-        envStateMsg.ParseFromString(request)
+        state_msg.ParseFromString(request)
         self.msgInterface.PyRecvEnd()
 
-        self.obsData = self._create_data(envStateMsg.obsData)
-        self.reward = envStateMsg.reward
-        self.gameOver = envStateMsg.isGameOver
-        self.gameOverReason = envStateMsg.reason
-        self.agent_selection = envStateMsg.agentID
+        self.obsData = self._create_data(state_msg.obsData)
+        self.reward = state_msg.reward
+        self.gameOver = state_msg.isGameOver
+        self.gameOverReason = state_msg.reason
+        self.agent_selection = state_msg.agentID
 
         if self.gameOver:
             self.send_close_command()
 
-        self.extraInfo = dict(envStateMsg.info)
+        self.extraInfo = dict(state_msg.info)
 
         self.newStateRx = True
 
-    def wrap(self, data) -> dict[str, Any]:
-        return {self.agent_selection: data}
-
-    def get_obs(self):
-        return self.wrap(super().get_obs())
-
-    def get_reward(self):
-        return self.wrap(super().get_reward())
-
-    def is_game_over(self):
-        return self.wrap(super().is_game_over())
-
-    def get_extra_info(self):
-        return self.wrap(super().get_extra_info())
-
-    def send_actions(self, actions):
+    def send_actions(self, actions: dict[str, Any]) -> bool:
         reply = pb.EnvActMsg()
 
-        actionMsg = self._pack_data(actions, self.action_space[self.agent_selection])
-        reply.actData.CopyFrom(actionMsg)
+        action_msg = self._pack_data(actions[self.agent_selection], self.action_space[self.agent_selection])
+        reply.actData.CopyFrom(action_msg)
 
-        replyMsg = reply.SerializeToString()
-        assert len(replyMsg) <= py_binding.msg_buffer_size
+        reply_msg = reply.SerializeToString()
+        assert len(reply_msg) <= py_binding.msg_buffer_size
         self.msgInterface.PySendBegin()
-        self.msgInterface.GetPy2CppStruct().size = len(replyMsg)
-        self.msgInterface.GetPy2CppStruct().get_buffer_full()[:len(replyMsg)] = replyMsg
+        self.msgInterface.GetPy2CppStruct().size = len(reply_msg)
+        self.msgInterface.GetPy2CppStruct().get_buffer_full()[: len(reply_msg)] = reply_msg
         self.msgInterface.PySendEnd()
         self.newStateRx = False
         return True
 
-    def get_random_action(self):
-        act = self.action_space[self.agent_selection].sample()
-        return act
+    def wrap(self, data: T) -> dict[str, T]:
+        return {self.agent_selection: data}
+
+    def step(self, actions: dict[str, Any]) -> tuple[dict[str, Any], ...]:
+        return tuple(self.wrap(state) for state in super().step(actions))
+
+    def reset(
+        self,
+        *,
+        seed: int | None = None,
+        options: dict | None = None,
+    ) -> tuple[dict[str, Any], dict[str, dict[str, Any]]]:
+        return tuple(self.wrap(state) for state in super().reset(seed, options))
+
+    def get_random_action(self) -> Any:
+        return self.action_space[self.agent_selection].sample()

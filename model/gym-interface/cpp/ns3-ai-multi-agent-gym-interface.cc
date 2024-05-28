@@ -15,13 +15,6 @@ namespace ns3
 NS_LOG_COMPONENT_DEFINE("OpenGymMultiAgentInterface");
 NS_OBJECT_ENSURE_REGISTERED(OpenGymMultiAgentInterface);
 
-Ptr<OpenGymMultiAgentInterface>
-OpenGymMultiAgentInterface::Get()
-{
-    NS_LOG_FUNCTION_NOARGS();
-    return *DoGet();
-}
-
 OpenGymMultiAgentInterface::OpenGymMultiAgentInterface()
     : m_simEnd(false),
       m_stopEnvRequested(false),
@@ -260,25 +253,6 @@ OpenGymMultiAgentInterface::SetGetObservationSpaceCb(std::string agentId,
                                                      Callback<Ptr<OpenGymSpace>> cb)
 {
     m_observationSpaceCbs[agentId] = cb;
-}
-
-void
-OpenGymMultiAgentInterface::DoInitialize()
-{
-    NS_LOG_FUNCTION(this);
-}
-
-void
-OpenGymMultiAgentInterface::DoDispose()
-{
-    NS_LOG_FUNCTION(this);
-}
-
-Ptr<OpenGymMultiAgentInterface>*
-OpenGymMultiAgentInterface::DoGet()
-{
-    static Ptr<OpenGymMultiAgentInterface> ptr = CreateObject<OpenGymMultiAgentInterface>();
-    return &ptr;
 }
 
 } // namespace ns3

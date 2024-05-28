@@ -17,10 +17,9 @@ class OpenGymSpace;
 class OpenGymDataContainer;
 class OpenGymEnv;
 
-class OpenGymMultiAgentInterface : public Object
+class OpenGymMultiAgentInterface : public Singleton<OpenGymMultiAgentInterface>, public Object
 {
   public:
-    static Ptr<OpenGymMultiAgentInterface> Get();
     OpenGymMultiAgentInterface();
     ~OpenGymMultiAgentInterface() override;
     static TypeId GetTypeId();
@@ -46,13 +45,7 @@ class OpenGymMultiAgentInterface : public Object
     void SetGetActionSpaceCb(std::string agentId, Callback<Ptr<OpenGymSpace>> cb);
     void SetGetObservationSpaceCb(std::string agentId, Callback<Ptr<OpenGymSpace>> cb);
 
-  protected:
-    // Inherited
-    void DoInitialize() override;
-    void DoDispose() override;
-
   private:
-    static Ptr<OpenGymMultiAgentInterface>* DoGet();
 
     bool m_simEnd;
     bool m_stopEnvRequested;

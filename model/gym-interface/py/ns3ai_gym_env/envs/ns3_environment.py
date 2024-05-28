@@ -1,11 +1,13 @@
+from contextlib import suppress
 from typing import Any
 
-import numpy as np
 import gymnasium as gym
-from gymnasium import spaces
 import messages_pb2 as pb
 import ns3ai_gym_msg_py as py_binding
+import numpy as np
+from gymnasium import spaces
 from ns3ai_utils import Experiment
+from psutil import TimeoutExpired
 
 
 class Ns3Env(gym.Env):
@@ -270,13 +272,16 @@ class Ns3Env(gym.Env):
         extraInfo = self.get_extra_info()
         return obs, reward, done, False, extraInfo
 
-    def __init__(self, targetName, ns3Path, ns3Settings: dict[str, Any] | None = None, shmSize=4096):
+    def __init__(
+        self, targetName, ns3Path, ns3Settings: dict[str, Any] | None = None, debug: bool = False, shmSize=4096
+    ):
         if self._created:
             raise Exception('Error: Ns3Env is singleton')
         self.targetName = targetName
+        self.debug = debug
         self.shmSize = shmSize
         self._created = True
-        self.exp = Experiment(targetName, ns3Path, py_binding, shmSize=shmSize)
+        self.exp = Experiment(targetName, ns3Path, py_binding, debug=debug, shmSize=shmSize)
         self.ns3Settings = ns3Settings
 
         self.newStateRx = False
@@ -337,7 +342,8 @@ class Ns3Env(gym.Env):
         if not self.gameOver:
             self.rx_env_state()
             self.send_close_command()
-            self.exp.proc.wait(2)
+            with suppress(TimeoutExpired):
+                self.exp.proc.wait(2)
 
         # environment is not needed anymore, so kill subprocess in a straightforward way
         self.exp.kill()
@@ -349,6 +355,7 @@ class Ns3Env(gym.Env):
             "targetName": self.targetName,
             "ns3Path": ".",
             "ns3Settings": self.ns3Settings,
+            "debug": self.debug,
             "shmSize": self.shmSize,
         }
 

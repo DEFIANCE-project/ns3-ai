@@ -32,7 +32,7 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
             self.action_space[agent] = self._create_space(space)
 
         for agent, space in init_msg.obsSpaces.items():
-            self.action_space[agent] = self._create_space(space)
+            self.observation_space[agent] = self._create_space(space)
 
         reply = pb.SimInitAck()
         reply.done = True

@@ -15,12 +15,12 @@ T = TypeVar("T")
 
 class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
     def __init__(
-        self, targetName: str, ns3Path: str, ns3Settings: dict[str, Any] | None = None, shmSize: int = 4096
+        self, *args: Any, **kwargs: Any
     ) -> None:
         self.action_space: dict[str, spaces.Space] = {}
         self.observation_space: dict[str, spaces.Space] = {}
         self.agent_selection: str | None = None
-        super().__init__(targetName, ns3Path, ns3Settings, shmSize)
+        super().__init__(*args, **kwargs)
 
     def initialize_env(self) -> Literal[True]:
         init_msg = pb.MultiAgentSimInitMsg()

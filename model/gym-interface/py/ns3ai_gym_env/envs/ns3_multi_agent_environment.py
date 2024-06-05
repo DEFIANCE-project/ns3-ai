@@ -5,12 +5,15 @@ import ns3ai_gym_msg_py as py_binding
 from gymnasium import spaces
 from ray.rllib.env.multi_agent_env import MultiAgentEnv
 
+from ns3ai_gym_env.typing import copy_signature_from
+
 from .ns3_environment import Ns3Env
 
 T = TypeVar("T")
 
 
 class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
+    @copy_signature_from(Ns3Env.__init__)
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self._action_space: dict[str, spaces.Space] = {}
         self._observation_space: dict[str, spaces.Space] = {}

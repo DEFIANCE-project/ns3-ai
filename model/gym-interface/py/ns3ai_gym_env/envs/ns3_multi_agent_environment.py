@@ -2,13 +2,13 @@ from typing import TYPE_CHECKING, Any, Literal, TypeVar
 
 import messages_pb2 as pb
 import ns3ai_gym_msg_py as py_binding
-from ray.rllib.env.multi_agent_env import MultiAgentEnv
-
-from .ns3_environment import Ns3Env
 
 # if TYPE_CHECKING:
 #     from gymnasium import spaces
 from gymnasium import spaces
+from ray.rllib.env.multi_agent_env import MultiAgentEnv
+
+from .ns3_environment import Ns3Env
 
 T = TypeVar("T")
 

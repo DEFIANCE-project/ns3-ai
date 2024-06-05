@@ -15,8 +15,8 @@ T = TypeVar("T")
 class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
     @copy_signature_from(Ns3Env.__init__)
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        self._action_space: dict[str, spaces.Space] = {}
-        self._observation_space: dict[str, spaces.Space] = {}
+        self.action_space: spaces.Dict = spaces.Dict()
+        self.observation_space: spaces.Dict = spaces.Dict()
         self.agent_selection: str | None = None
         super().__init__(*args, **kwargs)
         MultiAgentEnv.__init__(self)
@@ -29,12 +29,10 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
         self.msgInterface.PyRecvEnd()
 
         for agent, space in init_msg.actSpaces.items():
-            self._action_space[agent] = self._create_space(space)
-        self.action_space = spaces.Dict(self._action_space)
+            self.action_space[agent] = self._create_space(space)
 
         for agent, space in init_msg.obsSpaces.items():
-            self._observation_space[agent] = self._create_space(space)
-        self.observation_space = spaces.Dict(self._observation_space)
+            self.observation_space[agent] = self._create_space(space)
 
         reply = pb.SimInitAck()
         reply.done = True

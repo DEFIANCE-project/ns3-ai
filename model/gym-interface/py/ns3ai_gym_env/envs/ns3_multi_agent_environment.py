@@ -19,6 +19,7 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
         self._observation_space: dict[str, spaces.Space] = {}
         self.agent_selection: str | None = None
         super().__init__(*args, **kwargs)
+        MultiAgentEnv.__init__(self)
 
     def initialize_env(self) -> Literal[True]:
         init_msg = pb.MultiAgentSimInitMsg()

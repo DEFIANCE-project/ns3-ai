@@ -1,8 +1,7 @@
-from typing import TYPE_CHECKING, Any, Literal, TypeVar
+from typing import Any, Literal, TypeVar
 
 import messages_pb2 as pb
 import ns3ai_gym_msg_py as py_binding
-
 from gymnasium import spaces
 from ray.rllib.env.multi_agent_env import MultiAgentEnv
 

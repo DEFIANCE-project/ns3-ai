@@ -3,8 +3,6 @@ from typing import TYPE_CHECKING, Any, Literal, TypeVar
 import messages_pb2 as pb
 import ns3ai_gym_msg_py as py_binding
 
-# if TYPE_CHECKING:
-#     from gymnasium import spaces
 from gymnasium import spaces
 from ray.rllib.env.multi_agent_env import MultiAgentEnv
 
@@ -46,9 +44,7 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
 
         self.msgInterface.PySendBegin()
         self.msgInterface.GetPy2CppStruct().size = len(reply_str)
-        self.msgInterface.GetPy2CppStruct().get_buffer_full()[: len(reply_str)] = (
-            reply_str
-        )
+        self.msgInterface.GetPy2CppStruct().get_buffer_full()[: len(reply_str)] = reply_str
         self.msgInterface.PySendEnd()
         return True
 
@@ -78,18 +74,14 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
     def send_actions(self, actions: dict[str, Any]) -> bool:
         reply = pb.EnvActMsg()
 
-        action_msg = self._pack_data(
-            actions[self.agent_selection], self.action_space[self.agent_selection]
-        )
+        action_msg = self._pack_data(actions[self.agent_selection], self.action_space[self.agent_selection])
         reply.actData.CopyFrom(action_msg)
 
         reply_msg = reply.SerializeToString()
         assert len(reply_msg) <= py_binding.msg_buffer_size
         self.msgInterface.PySendBegin()
         self.msgInterface.GetPy2CppStruct().size = len(reply_msg)
-        self.msgInterface.GetPy2CppStruct().get_buffer_full()[: len(reply_msg)] = (
-            reply_msg
-        )
+        self.msgInterface.GetPy2CppStruct().get_buffer_full()[: len(reply_msg)] = reply_msg
         self.msgInterface.PySendEnd()
         self.newStateRx = False
         return True

@@ -28,12 +28,10 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
         for agent, space in init_msg.actSpaces.items():
             self._action_space[agent] = self._create_space(space)
         self.action_space = spaces.Dict(self._action_space)
-        print(self.action_space)
 
         for agent, space in init_msg.obsSpaces.items():
             self._observation_space[agent] = self._create_space(space)
         self.observation_space = spaces.Dict(self._observation_space)
-        print(self.observation_space)
 
         reply = pb.SimInitAck()
         reply.done = True

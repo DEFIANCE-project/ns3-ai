@@ -70,6 +70,7 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
         self.newStateRx = True
 
     def send_actions(self, actions: dict[str, Any]) -> bool:
+        assert self.agent_selection
         reply = pb.EnvActMsg()
 
         action_msg = self._pack_data(actions[self.agent_selection], self.action_space[self.agent_selection])
@@ -85,6 +86,7 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
         return True
 
     def wrap(self, data: T) -> dict[str, T]:
+        assert self.agent_selection is not None
         return {self.agent_selection: data}
 
     def step(self, actions: dict[str, Any]) -> tuple[dict[str, Any], ...]:
@@ -104,4 +106,5 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
         return tuple(self.wrap(state) for state in super().reset(seed, options))
 
     def get_random_action(self) -> Any:
+        assert self.agent_selection is not None
         return self.action_space[self.agent_selection].sample()

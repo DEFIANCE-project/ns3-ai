@@ -14,11 +14,9 @@ T = TypeVar("T")
 
 
 class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
-    def __init__(
-        self, *args: Any, **kwargs: Any
-    ) -> None:
-        self.action_space: dict[str, spaces.Space] = {}
-        self.observation_space: dict[str, spaces.Space] = {}
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self._action_space: dict[str, spaces.Space] = {}
+        self._observation_space: dict[str, spaces.Space] = {}
         self.agent_selection: str | None = None
         super().__init__(*args, **kwargs)
 
@@ -30,10 +28,14 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
         self.msgInterface.PyRecvEnd()
 
         for agent, space in init_msg.actSpaces.items():
-            self.action_space[agent] = self._create_space(space)
+            self._action_space[agent] = self._create_space(space)
+        self.action_space = spaces.Dict(self._action_space)
+        print(self.action_space)
 
         for agent, space in init_msg.obsSpaces.items():
-            self.observation_space[agent] = self._create_space(space)
+            self._observation_space[agent] = self._create_space(space)
+        self.observation_space = spaces.Dict(self._observation_space)
+        print(self.observation_space)
 
         reply = pb.SimInitAck()
         reply.done = True
@@ -43,7 +45,9 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
 
         self.msgInterface.PySendBegin()
         self.msgInterface.GetPy2CppStruct().size = len(reply_str)
-        self.msgInterface.GetPy2CppStruct().get_buffer_full()[: len(reply_str)] = reply_str
+        self.msgInterface.GetPy2CppStruct().get_buffer_full()[: len(reply_str)] = (
+            reply_str
+        )
         self.msgInterface.PySendEnd()
         return True
 
@@ -73,14 +77,18 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
     def send_actions(self, actions: dict[str, Any]) -> bool:
         reply = pb.EnvActMsg()
 
-        action_msg = self._pack_data(actions[self.agent_selection], self.action_space[self.agent_selection])
+        action_msg = self._pack_data(
+            actions[self.agent_selection], self.action_space[self.agent_selection]
+        )
         reply.actData.CopyFrom(action_msg)
 
         reply_msg = reply.SerializeToString()
         assert len(reply_msg) <= py_binding.msg_buffer_size
         self.msgInterface.PySendBegin()
         self.msgInterface.GetPy2CppStruct().size = len(reply_msg)
-        self.msgInterface.GetPy2CppStruct().get_buffer_full()[: len(reply_msg)] = reply_msg
+        self.msgInterface.GetPy2CppStruct().get_buffer_full()[: len(reply_msg)] = (
+            reply_msg
+        )
         self.msgInterface.PySendEnd()
         self.newStateRx = False
         return True

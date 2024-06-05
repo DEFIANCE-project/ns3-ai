@@ -97,7 +97,12 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
         return {self.agent_selection: data}
 
     def step(self, actions: dict[str, Any]) -> tuple[dict[str, Any], ...]:
-        return tuple(self.wrap(state) for state in super().step(actions))
+        obs, rew, truncateds, terminateds, info = tuple(
+            self.wrap(state) for state in super().step(actions)
+        )
+        terminateds["__all__"] = all(terminated for terminated in terminateds.values())
+        truncateds["__all__"] = all(truncated for truncated in truncateds.values())
+        return obs, rew, truncateds, terminateds, info
 
     def reset(
         self,

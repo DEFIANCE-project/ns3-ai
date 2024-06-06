@@ -7,7 +7,7 @@ import ns3ai_gym_msg_py as py_binding
 import numpy as np
 from gymnasium import spaces
 from ns3ai_utils import Experiment
-from psutil import TimeoutExpired
+from subprocess import TimeoutExpired
 
 
 class Ns3Env(gym.Env):

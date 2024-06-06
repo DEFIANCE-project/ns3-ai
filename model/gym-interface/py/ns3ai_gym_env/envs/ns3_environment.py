@@ -33,7 +33,7 @@ class Ns3Env(gym.Env):
             elif mtype == pb.UINT:
                 raise NotImplementedError("uint is not supported by all rl frameworks. Use int instead!")
             elif mtype == pb.DOUBLE:
-                mtype = np.float32
+                mtype = np.float64
             else:
                 mtype = np.float32
 
@@ -77,16 +77,15 @@ class Ns3Env(gym.Env):
             # print(boxContainerPb.shape, boxContainerPb.dtype, boxContainerPb.uintData)
 
             if boxContainerPb.dtype == pb.INT:
-                data = boxContainerPb.intData
+                data = np.array(boxContainerPb.doubleData, dtype=int)
             elif boxContainerPb.dtype == pb.UINT:
-                data = boxContainerPb.uintData
+                data = np.array(boxContainerPb.doubleData, dtype=np.uint)
             elif boxContainerPb.dtype == pb.DOUBLE:
-                data = boxContainerPb.doubleData
+                data = np.array(boxContainerPb.doubleData, dtype=np.float64)
             else:
-                data = boxContainerPb.floatData
+                data = np.array(boxContainerPb.floatData, dtype=np.float32)
 
             # TODO: reshape using shape info
-            data = np.array(data)
             return data
 
         elif dataContainerPb.type == pb.Tuple:
@@ -207,11 +206,11 @@ class Ns3Env(gym.Env):
             elif spaceDesc.dtype in ['uint', 'uint8', 'uint16', 'uint32', 'uint64']:
                 raise NotImplementedError("uint is not supported by all rl frameworks. Use int instead!")
 
-            elif spaceDesc.dtype in ['float', 'float32', 'float64']:
+            elif spaceDesc.dtype.name in ["float", "float32"]:
                 boxContainerPb.dtype = pb.FLOAT
                 boxContainerPb.floatData.extend(actions)
 
-            elif spaceDesc.dtype in ['double']:
+            elif spaceDesc.dtype.name in ["double", "float64"]:
                 boxContainerPb.dtype = pb.DOUBLE
                 boxContainerPb.doubleData.extend(actions)
 

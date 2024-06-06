@@ -115,6 +115,7 @@ OpenGymDataContainer::CreateFromDataContainerPbMsg(ns3_ai_gym::DataContainer& da
         }
         else
         {
+            NS_LOG_WARN("Unknown data type in Box container. Using default float.");
             Ptr<OpenGymBoxContainer<float>> box = CreateObject<OpenGymBoxContainer<float>>();
             std::vector<float> myData;
             myData.assign(boxContainerPbMsg.floatdata().begin(),

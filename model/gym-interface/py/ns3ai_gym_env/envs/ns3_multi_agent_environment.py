@@ -33,7 +33,7 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
 
         for agent, space in init_msg.obsSpaces.items():
             self.observation_space[agent] = self._create_space(space)
-
+        self._agent_ids = list(self.action_space.keys())
         reply = pb.SimInitAck()
         reply.done = True
         reply.stopSimReq = False
@@ -93,6 +93,11 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
         obs, rew, terminateds, truncateds, info = tuple(self.wrap(state) for state in super().step(actions))
         terminateds["__all__"] = all(terminated for terminated in terminateds.values())
         truncateds["__all__"] = all(truncated for truncated in truncateds.values())
+        obs.pop("", "")
+        rew.pop("", "")
+        terminateds.pop("", "")
+        truncateds.pop("", "")
+        info.pop("", "")
         return obs, rew, terminateds, truncateds, info
 
     def reset(

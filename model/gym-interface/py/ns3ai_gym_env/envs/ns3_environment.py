@@ -23,8 +23,8 @@ class Ns3Env(gym.Env):
         elif spaceDesc.type == pb.Box:
             boxSpacePb = pb.BoxSpace()
             spaceDesc.space.Unpack(boxSpacePb)
-            low = boxSpacePb.low
-            high = boxSpacePb.high
+            low = np.array(boxSpacePb.lows) if boxSpacePb.lows else boxSpacePb.low
+            high = np.array(boxSpacePb.highs) if boxSpacePb.highs else boxSpacePb.high
             shape = tuple(boxSpacePb.shape)
             mtype = boxSpacePb.dtype
 
@@ -311,7 +311,8 @@ class Ns3Env(gym.Env):
         if not self.gameOver:
             self.rx_env_state()
             self.send_close_command()
-            self.exp.proc.wait(2)
+            with suppress(TimeoutExpired):
+                self.exp.proc.wait(2)
 
         self.msgInterface = None
         self.newStateRx = False

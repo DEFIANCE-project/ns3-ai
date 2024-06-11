@@ -1,4 +1,6 @@
 from contextlib import suppress
+from pathlib import Path
+from subprocess import TimeoutExpired
 from typing import Any
 
 import gymnasium as gym
@@ -7,7 +9,6 @@ import ns3ai_gym_msg_py as py_binding
 import numpy as np
 from gymnasium import spaces
 from ns3ai_utils import Experiment
-from subprocess import TimeoutExpired
 
 
 class Ns3Env(gym.Env):
@@ -278,7 +279,12 @@ class Ns3Env(gym.Env):
         return obs, reward, terminated, truncated, extraInfo
 
     def __init__(
-        self, targetName, ns3Path, ns3Settings: dict[str, Any] | None = None, debug: bool = False, shmSize=4096
+        self,
+        targetName: str | Path,
+        ns3Path: str,
+        ns3Settings: dict[str, Any] | None = None,
+        debug: bool = False,
+        shmSize=4096,
     ):
         if self._created:
             raise Exception('Error: Ns3Env is singleton')

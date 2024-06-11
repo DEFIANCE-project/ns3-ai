@@ -271,9 +271,9 @@ class Ns3Env(gym.Env):
         truncated = False
         if self.is_game_over():
             if self.gameOverReason == 1:
-                terminated = True # end because the agent reached its final state
+                terminated = True  # end because the agent reached its final state
             else:
-                truncated = True # end because the simulation ended (for this agent)
+                truncated = True  # end because the simulation ended (for this agent)
         extraInfo = self.get_extra_info()
         return obs, reward, terminated, truncated, extraInfo
 

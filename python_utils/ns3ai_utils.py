@@ -53,9 +53,9 @@ def run_single_ns3(
         cmd = pname
     else:
         exec_path = os.path.join(path, "ns3")
-        cmd = f"{exec_path} run {pname}"
+        cmd = f"{exec_path} run {pname} --"
     if setting:
-        cmd += f" --{get_setting(setting)}"
+        cmd += get_setting(setting)
     if debug:
         cmd = f"sleep infinity && {cmd}"
     if show_output:

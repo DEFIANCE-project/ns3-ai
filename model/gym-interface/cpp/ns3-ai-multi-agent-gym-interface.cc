@@ -196,20 +196,32 @@ OpenGymMultiAgentInterface::NotifyCurrentState(
 }
 
 void
-OpenGymMultiAgentInterface::WaitForStop()
+OpenGymMultiAgentInterface::WaitForStop(float reward,
+                                        bool isGameOver,
+                                        const std::map<std::string, std::string>& extraInfo)
 {
     NS_LOG_FUNCTION(this);
-    NotifyCurrentState("", {}, 0, true, {}, Seconds(0), *[](Ptr<OpenGymDataContainer>) {});
+
+    NotifyCurrentState(
+        "",
+        {},
+        reward,
+        isGameOver,
+        extraInfo,
+        Seconds(0),
+        *[](Ptr<OpenGymDataContainer>) {});
 }
 
 void
-OpenGymMultiAgentInterface::NotifySimulationEnd()
+OpenGymMultiAgentInterface::NotifySimulationEnd(float reward,
+                                                bool isGameOver,
+                                                const std::map<std::string, std::string>& extraInfo)
 {
     NS_LOG_FUNCTION(this);
     m_simEnd = true;
     if (m_initSimMsgSent)
     {
-        WaitForStop();
+        WaitForStop(reward, isGameOver, extraInfo);
     }
 }
 

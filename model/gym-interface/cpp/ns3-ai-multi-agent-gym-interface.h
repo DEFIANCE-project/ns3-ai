@@ -33,8 +33,12 @@ class OpenGymMultiAgentInterface : public Object
                             const std::map<std::string, std::string>& extraInfo,
                             Time actionDelay,
                             Callback<void, Ptr<OpenGymDataContainer>> actionCallback);
-    void WaitForStop();
-    void NotifySimulationEnd();
+    void WaitForStop(float reward = 0,
+                     bool isGameOver = true,
+                     const std::map<std::string, std::string>& extraInfo = {});
+    void NotifySimulationEnd(float reward = 0,
+                             bool isGameOver = true,
+                             const std::map<std::string, std::string>& extraInfo = {});
 
     std::map<std::string, Ptr<OpenGymSpace>> GetActionSpace();
     std::map<std::string, Ptr<OpenGymSpace>> GetObservationSpace();

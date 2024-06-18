@@ -207,14 +207,13 @@ OpenGymMultiAgentInterface::WaitForStop(float reward,
 
 void
 OpenGymMultiAgentInterface::NotifySimulationEnd(float reward,
-                                                bool isGameOver,
                                                 const std::map<std::string, std::string>& extraInfo)
 {
     NS_LOG_FUNCTION(this);
     m_simEnd = true;
     if (m_initSimMsgSent)
     {
-        WaitForStop(reward, isGameOver, extraInfo);
+        WaitForStop(reward, true, extraInfo);
     }
 }
 

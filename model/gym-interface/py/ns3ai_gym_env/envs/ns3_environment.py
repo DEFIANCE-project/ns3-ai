@@ -285,6 +285,11 @@ class Ns3Env(gym.Env):
         ns3Settings: dict[str, Any] | None = None,
         debug: bool = False,
         shmSize=4096,
+        segName="My Seg",  # the names for the shared memory segments used by boost
+        cpp2pyMsgName="My Cpp to Python Msg",
+        py2cppMsgName="My Python to Cpp Msg",
+        lockableName="My Lockable",
+        trial_name: str | None = None,
     ):
         if self._created:
             raise Exception('Error: Ns3Env is singleton')
@@ -292,9 +297,27 @@ class Ns3Env(gym.Env):
         self.debug = debug
         self.shmSize = shmSize
         self._created = True
-        self.exp = Experiment(targetName, ns3Path, py_binding, debug=debug, shmSize=shmSize)
         self.ns3Settings = ns3Settings
+        if trial_name is not None:
+            # indexing the memory segments with the trial name to allow parallel execution of ns3 environments
+            self.ns3Settings["trial_name"] = trial_name # add trial name to the command line arguments so the ns3 process can use it
+            segName = segName + trial_name
+            cpp2pyMsgName = cpp2pyMsgName + trial_name
+            py2cppMsgName = py2cppMsgName + trial_name
+            lockableName = lockableName + trial_name
 
+        self.exp = Experiment(
+            targetName,
+            ns3Path,
+            py_binding,
+            debug=debug,
+            shmSize=shmSize,
+            segName=segName,
+            cpp2pyMsgName=cpp2pyMsgName,
+            py2cppMsgName=py2cppMsgName,
+            lockableName=lockableName,
+        )
+        
         self.newStateRx = False
         self.obsData = None
         self.reward = 0

@@ -78,9 +78,9 @@ class Ns3Env(gym.Env):
             # print(boxContainerPb.shape, boxContainerPb.dtype, boxContainerPb.uintData)
 
             if boxContainerPb.dtype == pb.INT:
-                data = np.array(boxContainerPb.doubleData, dtype=int)
+                data = np.array(boxContainerPb.intData, dtype=int)
             elif boxContainerPb.dtype == pb.UINT:
-                data = np.array(boxContainerPb.doubleData, dtype=np.uint)
+                data = np.array(boxContainerPb.uintData, dtype=np.uint)
             elif boxContainerPb.dtype == pb.DOUBLE:
                 data = np.array(boxContainerPb.doubleData, dtype=np.float64)
             else:

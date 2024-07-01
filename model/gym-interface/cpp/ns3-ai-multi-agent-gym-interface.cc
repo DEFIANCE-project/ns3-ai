@@ -178,8 +178,7 @@ OpenGymMultiAgentInterface::NotifyCurrentState(
         NS_LOG_DEBUG("---Stop requested: " << stopSim);
         m_stopEnvRequested = true;
         Simulator::Stop();
-        Simulator::Destroy();
-        NS_ABORT_MSG("Simulation stopped!");
+        return;
     }
 
     // first step after reset is called without actions, just to get current state

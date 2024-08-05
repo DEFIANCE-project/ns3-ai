@@ -17,6 +17,7 @@
 #         Hao Yin <haoyin@uw.edu>
 #         Muyuan Shen <muyuan_shen@hust.edu.cn>
 
+import logging
 import os
 import subprocess
 import time
@@ -24,6 +25,9 @@ from pathlib import Path
 from typing import Any
 
 import psutil
+
+logger = logging.getLogger(__name__)
+
 
 SIMULATION_EARLY_ENDING = 0.5   # wait and see if the subprocess is running after creation
 
@@ -77,7 +81,7 @@ def run_single_ns3(
 
 # used to kill the ns-3 script process and its child processes
 def kill_proc_tree(p, timeout=None, on_terminate=None):
-    print('ns3ai_utils: Killing subprocesses...')
+    logger.info('ns3ai_utils: Killing subprocesses...')
     if isinstance(p, int):
         p = psutil.Process(p)
     elif not isinstance(p, psutil.Process):
@@ -158,12 +162,12 @@ class Experiment:
 
         self.proc = None
         self.simCmd = None
-        print('ns3ai_utils: Experiment initialized')
+        logger.info('ns3ai_utils: Experiment initialized')
 
     def __del__(self):
         self.kill()
         del self.msgInterface
-        print('ns3ai_utils: Experiment destroyed')
+        logger.info('ns3ai_utils: Experiment destroyed')
 
     # run ns3 script in cmd with the setting being input
     # \param[in] setting : ns3 script input parameters(default : None)
@@ -177,11 +181,11 @@ class Experiment:
             show_output=show_output,
             debug=self.debug,
         )
-        print("ns3ai_utils: Running ns-3 with: ", self.simCmd)
+        logger.info("ns3ai_utils: Running ns-3 with: %s", self.simCmd)
         # exit if an early error occurred, such as wrong target name
         time.sleep(SIMULATION_EARLY_ENDING)
         if not self.isalive():
-            print('ns3ai_utils: Subprocess died very early')
+            logger.info('ns3ai_utils: Subprocess died very early')
             exit(1)
         return self.msgInterface
 

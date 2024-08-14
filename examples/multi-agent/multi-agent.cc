@@ -83,16 +83,18 @@ int
 main(int argc, char* argv[])
 {
     int numAgents = 2;
-    int seedRunNumber = 1;
+    int runId = 1;
     CommandLine cmd;
     cmd.AddValue("numAgents", "Number of agents that act in the environment", numAgents);
-    cmd.AddValue("seedRunNumber",
+    cmd.AddValue("runId",
                  "Counts how often the environment has been reset (used for seeding)",
-                 seedRunNumber);
+                 runId);
     cmd.Parse(argc, argv);
 
     RngSeedManager::SetSeed(42);
-    RngSeedManager::SetRun(seedRunNumber);
+    RngSeedManager::SetRun(runId);
+
+    std::cout << runId << std::endl;
 
     auto randomNumber = CreateObject<UniformRandomVariable>();
     randomNumber->SetAttribute("Min", DoubleValue(-42));

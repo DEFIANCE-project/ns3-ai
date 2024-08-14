@@ -457,32 +457,35 @@ ns3 simulation:
 
 ``` cpp
 int seed = 1;
-int seedRunNumber = 1;
+int runId = 1;
 CommandLine cmd;
 cmd.AddValue("seed", "The seed used for reproducibility", seed);
 cmd.AddValue(
-    "seedRunNumber",
+    "runId",
     "Counts how often the environment has been reset (used for seeding)",
-    seedRunNumber);
+    runId);
 cmd.Parse(argc, argv);
 
 RngSeedManager::SetSeed(seed);
-RngSeedManager::SetRun(seedRunNumber);
+RngSeedManager::SetRun(runId);
 ```
 
 In Python, the seed can be set in the `ns3Settings` dictionary:
 
 ``` python
-ns3Settings: dict[str] = {"numAgents": 3, "seed": 1, "seedRunNumber": 1}
+ns3Settings: dict[str] = {"numAgents": 3, "seed": 1, "runId": 1}
 ```
 
 >[!NOTE]
 >In order to achieve meaningful results it has to be ensured that the
 >agents to not overfit during training. Therefore, a different seed
 >should be used each time the environment is reset. This is done
->automatically when the argument `seedRunNumber` is provided to the
+>automatically when the argument `runId` is provided to the
 >`ns3Settings`. The run number is increased by one each time the
 >environment is reset.
+
+>[WARNING]
+>*ns3* does not allow for the seed 0, and the current implementation for the runId setting also enforces a number different to 0.
 
 #### Registering the Environment
 
@@ -569,7 +572,7 @@ snippet:
 
 ``` python
 trial = {"trial_name": 1}
-ns3Settings: dict[str] = {"numAgents": 3, "seed": 1, "seedRunNumber": 1}
+ns3Settings: dict[str] = {"numAgents": 3, "seed": 1, "runId": 1}
 
 env1:Ns3MultiAgentEnv = Ns3MultiAgentEnv(targetName=targetName, ns3Path=ns3Path, ns3Settings=(ns3Settings | trial))
 

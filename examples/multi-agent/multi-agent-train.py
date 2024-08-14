@@ -27,7 +27,7 @@ parser.add_argument("--numIterations", type=int, default=50, help="Number of tra
 args = parser.parse_args()
 
 targetName = "ns3ai_multi-agent"
-ns3Settings: dict[str] = {"numAgents": args.numAgents, "seedRunNumber": 1}
+ns3Settings: dict[str] = {"numAgents": args.numAgents, "runId": 1}
 
 env = Ns3MultiAgentEnv(targetName=targetName, ns3Path=args.ns3Path, ns3Settings=ns3Settings)
 env_obs_space = env.observation_space

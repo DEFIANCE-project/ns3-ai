@@ -26,7 +26,7 @@ parser.add_argument("--numSimulations", type=int, default=10, help="Number of si
 args = parser.parse_args()
 
 targetName = "ns3ai_multi-agent"
-ns3Settings: dict[str] = {"numAgents": args.numAgents, "seedRunNumber": 1}
+ns3Settings: dict[str] = {"numAgents": args.numAgents, "runId": 1}
 
 env = Ns3MultiAgentEnv(targetName=targetName, ns3Path=args.ns3Path, ns3Settings=ns3Settings)
 

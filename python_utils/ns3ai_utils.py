@@ -36,7 +36,7 @@ def get_setting(setting_map: dict[str, Any]) -> str:
     ret = ""
     for key, value in setting_map.items():
         ret += f" --{key}"
-        if value:
+        if value is not None:
             ret += f"={value}"
     return ret
 

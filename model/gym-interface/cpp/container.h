@@ -357,6 +357,7 @@ class OpenGymDictContainer : public OpenGymDataContainer
     }
 
     bool Add(std::string key, Ptr<OpenGymDataContainer> value);
+    bool Set(std::string key, Ptr<OpenGymDataContainer> value);
     Ptr<OpenGymDataContainer> Get(std::string key);
 
   protected:

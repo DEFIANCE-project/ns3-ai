@@ -421,6 +421,13 @@ OpenGymDictContainer::Add(std::string key, Ptr<OpenGymDataContainer> data)
     return true;
 }
 
+bool
+OpenGymDictContainer::Set(std::string key, Ptr<OpenGymDataContainer> data)
+{
+    NS_LOG_FUNCTION(this);
+    return m_dict.insert_or_assign(key, data).second;
+}
+
 Ptr<OpenGymDataContainer>
 OpenGymDictContainer::Get(std::string key)
 {

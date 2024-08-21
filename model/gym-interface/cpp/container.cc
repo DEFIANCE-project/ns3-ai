@@ -311,6 +311,17 @@ OpenGymTupleContainer::Get(uint32_t idx)
     return data;
 }
 
+bool
+OpenGymTupleContainer::Set(uint32_t idx, Ptr<OpenGymDataContainer> value)
+{
+    if (idx >= m_tuple.size())
+    {
+        return false;
+    }
+    m_tuple[idx] = value;
+    return true;
+}
+
 void
 OpenGymTupleContainer::Print(std::ostream& where) const
 {

@@ -326,6 +326,7 @@ class OpenGymTupleContainer : public OpenGymDataContainer
 
     bool Add(Ptr<OpenGymDataContainer> space);
     Ptr<OpenGymDataContainer> Get(uint32_t idx);
+    bool Set(uint32_t idx, Ptr<OpenGymDataContainer> value);
 
   protected:
     // Inherited

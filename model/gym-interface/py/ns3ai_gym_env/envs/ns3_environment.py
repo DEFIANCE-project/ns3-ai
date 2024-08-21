@@ -359,7 +359,7 @@ class Ns3Env(gym.Env):
         
         # Allow the user to increment the run number on environment reset. This way the random variables used inside the simulation will use different values. This is required for reproducibility and to avoid overfitting.
         if "runId" in self.ns3Settings:
-            self.ns3Settings["runId"] += 1
+            self.ns3Settings["runId"] = int(self.ns3Settings["runId"]) + 1
             
         self.msgInterface = self.exp.run(setting=self.ns3Settings, show_output=True)
         self.initialize_env()

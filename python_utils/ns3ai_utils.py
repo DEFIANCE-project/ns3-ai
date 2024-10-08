@@ -138,7 +138,7 @@ class Experiment:
         handleFinish=False,
         useVector=False,
         vectorSize=None,
-        shmSize=4096,
+        shmSize=8192,
         segName="My Seg",
         cpp2pyMsgName="My Cpp to Python Msg",
         py2cppMsgName="My Python to Cpp Msg",

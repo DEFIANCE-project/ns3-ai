@@ -345,10 +345,11 @@ OpenGymTupleContainer::Print(std::ostream& where) const
 std::vector<std::string>
 OpenGymDictContainer::GetKeys() const
 {
-    std::vector<std::string> keys(m_dict.size());
+    std::vector<std::string> keys;
+    keys.reserve(m_dict.size());
     for (const auto& [key, _] : m_dict)
     {
-        keys.push_back(key);
+        keys.emplace_back(key);
     }
     return keys;
 }

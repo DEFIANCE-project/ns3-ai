@@ -293,7 +293,7 @@ class Ns3Env(gym.Env):
         ns3Path: str,
         ns3Settings: dict[str, Any] | None = None,
         debug: bool = False,
-        shmSize=4096,
+        shmSize=8192,
         segName="My Seg",  # the names for the shared memory segments used by boost
         cpp2pyMsgName="My Cpp to Python Msg",
         py2cppMsgName="My Python to Cpp Msg",

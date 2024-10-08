@@ -32,7 +32,9 @@ class Ns3Env(gym.Env):
             if mtype == pb.INT:
                 mtype = int
             elif mtype == pb.UINT:
-                raise NotImplementedError("uint is not supported by all rl frameworks. Use int instead!")
+                raise NotImplementedError(
+                    "uint is not supported by all rl frameworks. Use int instead!"
+                )
             elif mtype == pb.DOUBLE:
                 mtype = np.float64
             else:
@@ -86,8 +88,7 @@ class Ns3Env(gym.Env):
             else:
                 data = np.array(boxContainerPb.floatData, dtype=np.float32)
 
-            # TODO: reshape using shape info
-            return data
+            return data.reshape(boxContainerPb.shape)
 
         elif dataContainerPb.type == pb.Tuple:
             tupleDataPb = pb.TupleDataContainer()
@@ -131,7 +132,9 @@ class Ns3Env(gym.Env):
 
         self.msgInterface.PySendBegin()
         self.msgInterface.GetPy2CppStruct().size = len(reply_str)
-        self.msgInterface.GetPy2CppStruct().get_buffer_full()[:len(reply_str)] = reply_str
+        self.msgInterface.GetPy2CppStruct().get_buffer_full()[: len(reply_str)] = (
+            reply_str
+        )
         self.msgInterface.PySendEnd()
         return True
 
@@ -143,7 +146,9 @@ class Ns3Env(gym.Env):
         assert len(replyMsg) <= py_binding.msg_buffer_size
         self.msgInterface.PySendBegin()
         self.msgInterface.GetPy2CppStruct().size = len(replyMsg)
-        self.msgInterface.GetPy2CppStruct().get_buffer_full()[:len(replyMsg)] = replyMsg
+        self.msgInterface.GetPy2CppStruct().get_buffer_full()[: len(replyMsg)] = (
+            replyMsg
+        )
         self.msgInterface.PySendEnd()
 
         self.newStateRx = False
@@ -200,12 +205,14 @@ class Ns3Env(gym.Env):
             shape = [len(actions)]
             boxContainerPb.shape.extend(shape)
 
-            if spaceDesc.dtype in ['int', 'int8', 'int16', 'int32', 'int64']:
+            if spaceDesc.dtype in ["int", "int8", "int16", "int32", "int64"]:
                 boxContainerPb.dtype = pb.INT
                 boxContainerPb.intData.extend(actions)
 
-            elif spaceDesc.dtype in ['uint', 'uint8', 'uint16', 'uint32', 'uint64']:
-                raise NotImplementedError("uint is not supported by all rl frameworks. Use int instead!")
+            elif spaceDesc.dtype in ["uint", "uint8", "uint16", "uint32", "uint64"]:
+                raise NotImplementedError(
+                    "uint is not supported by all rl frameworks. Use int instead!"
+                )
 
             elif spaceDesc.dtype.name in ["float", "float32"]:
                 boxContainerPb.dtype = pb.FLOAT
@@ -260,7 +267,9 @@ class Ns3Env(gym.Env):
         assert len(replyMsg) <= py_binding.msg_buffer_size
         self.msgInterface.PySendBegin()
         self.msgInterface.GetPy2CppStruct().size = len(replyMsg)
-        self.msgInterface.GetPy2CppStruct().get_buffer_full()[:len(replyMsg)] = replyMsg
+        self.msgInterface.GetPy2CppStruct().get_buffer_full()[: len(replyMsg)] = (
+            replyMsg
+        )
         self.msgInterface.PySendEnd()
         self.newStateRx = False
         return True
@@ -290,17 +299,23 @@ class Ns3Env(gym.Env):
         py2cppMsgName="My Python to Cpp Msg",
         lockableName="My Lockable",
         trial_name: str | None = None,
+        simulation_wd: Path | None = None,
+        runStep: int = 1,
     ):
         if self._created:
-            raise Exception('Error: Ns3Env is singleton')
+            raise Exception("Error: Ns3Env is singleton")
         self.targetName = targetName
         self.debug = debug
         self.shmSize = shmSize
         self._created = True
         self.ns3Settings = ns3Settings
+        self.simulation_wd = simulation_wd
+        self.runStep = runStep
         if trial_name is not None:
             # indexing the memory segments with the trial name to allow parallel execution of ns3 environments
-            self.ns3Settings["trial_name"] = trial_name # add trial name to the command line arguments so the ns3 process can use it
+            self.ns3Settings["trial_name"] = (
+                trial_name  # add trial name to the command line arguments so the ns3 process can use it
+            )
             segName = segName + trial_name
             cpp2pyMsgName = cpp2pyMsgName + trial_name
             py2cppMsgName = py2cppMsgName + trial_name
@@ -316,8 +331,9 @@ class Ns3Env(gym.Env):
             cpp2pyMsgName=cpp2pyMsgName,
             py2cppMsgName=py2cppMsgName,
             lockableName=lockableName,
+            simulation_wd=simulation_wd,
         )
-        
+
         self.newStateRx = False
         self.obsData = None
         self.reward = 0
@@ -356,11 +372,11 @@ class Ns3Env(gym.Env):
         self.gameOver = False
         self.gameOverReason = None
         self.extraInfo = None
-        
+
         # Allow the user to increment the run number on environment reset. This way the random variables used inside the simulation will use different values. This is required for reproducibility and to avoid overfitting.
         if "runId" in self.ns3Settings:
-            self.ns3Settings["runId"] = int(self.ns3Settings["runId"]) + 1
-            
+            self.ns3Settings["runId"] = int(self.ns3Settings["runId"]) + self.runStep
+
         self.msgInterface = self.exp.run(setting=self.ns3Settings, show_output=True)
         self.initialize_env()
         # get first observations
@@ -370,7 +386,7 @@ class Ns3Env(gym.Env):
         obs = self.get_obs()
         return obs, {}
 
-    def render(self, mode='human'):
+    def render(self, mode="human"):
         return
 
     def get_random_action(self):
@@ -396,6 +412,7 @@ class Ns3Env(gym.Env):
             "ns3Settings": self.ns3Settings,
             "debug": self.debug,
             "shmSize": self.shmSize,
+            "simulation_wd": self.simulation_wd,
         }
 
     def __setstate__(self, state):

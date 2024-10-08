@@ -207,7 +207,7 @@ OpenGymDiscreteContainer::DoInitialize()
 }
 
 ns3_ai_gym::DataContainer
-OpenGymDiscreteContainer::GetDataContainerPbMsg()
+OpenGymDiscreteContainer::GetDataContainerPbMsg() const
 {
     ns3_ai_gym::DataContainer dataContainerPbMsg;
     ns3_ai_gym::DiscreteDataContainer discreteContainerPbMsg;
@@ -270,17 +270,15 @@ OpenGymTupleContainer::DoInitialize()
 }
 
 ns3_ai_gym::DataContainer
-OpenGymTupleContainer::GetDataContainerPbMsg()
+OpenGymTupleContainer::GetDataContainerPbMsg() const
 {
     ns3_ai_gym::DataContainer dataContainerPbMsg;
     dataContainerPbMsg.set_type(ns3_ai_gym::Tuple);
 
     ns3_ai_gym::TupleDataContainer tupleContainerPbMsg;
 
-    std::vector<Ptr<OpenGymDataContainer>>::iterator it;
-    for (it = m_tuple.begin(); it != m_tuple.end(); ++it)
+    for (const auto& subSpace : m_tuple)
     {
-        Ptr<OpenGymDataContainer> subSpace = *it;
         ns3_ai_gym::DataContainer subDataContainer = subSpace->GetDataContainerPbMsg();
 
         tupleContainerPbMsg.add_element()->CopyFrom(subDataContainer);
@@ -299,7 +297,7 @@ OpenGymTupleContainer::Add(Ptr<OpenGymDataContainer> space)
 }
 
 Ptr<OpenGymDataContainer>
-OpenGymTupleContainer::Get(uint32_t idx)
+OpenGymTupleContainer::Get(uint32_t idx) const
 {
     Ptr<OpenGymDataContainer> data;
 
@@ -345,14 +343,12 @@ OpenGymTupleContainer::Print(std::ostream& where) const
 }
 
 std::vector<std::string>
-OpenGymDictContainer::GetKeys()
+OpenGymDictContainer::GetKeys() const
 {
-    std::vector<std::string> keys;
-    for (std::map<std::string, Ptr<OpenGymDataContainer>>::iterator it = m_dict.begin();
-         it != m_dict.end();
-         ++it)
+    std::vector<std::string> keys(m_dict.size());
+    for (const auto& [key, _] : m_dict)
     {
-        keys.push_back(it->first);
+        keys.push_back(key);
     }
     return keys;
 }
@@ -390,19 +386,15 @@ OpenGymDictContainer::DoInitialize()
 }
 
 ns3_ai_gym::DataContainer
-OpenGymDictContainer::GetDataContainerPbMsg()
+OpenGymDictContainer::GetDataContainerPbMsg() const
 {
     ns3_ai_gym::DataContainer dataContainerPbMsg;
     dataContainerPbMsg.set_type(ns3_ai_gym::Dict);
 
     ns3_ai_gym::DictDataContainer dictContainerPbMsg;
 
-    std::map<std::string, Ptr<OpenGymDataContainer>>::iterator it;
-    for (it = m_dict.begin(); it != m_dict.end(); ++it)
+    for (const auto& [name, subSpace] : m_dict)
     {
-        std::string name = it->first;
-        Ptr<OpenGymDataContainer> subSpace = it->second;
-
         ns3_ai_gym::DataContainer subDataContainer = subSpace->GetDataContainerPbMsg();
         subDataContainer.set_name(name);
 
@@ -429,10 +421,10 @@ OpenGymDictContainer::Set(std::string key, Ptr<OpenGymDataContainer> data)
 }
 
 Ptr<OpenGymDataContainer>
-OpenGymDictContainer::Get(std::string key)
+OpenGymDictContainer::Get(std::string key) const
 {
     Ptr<OpenGymDataContainer> data;
-    std::map<std::string, Ptr<OpenGymDataContainer>>::iterator it = m_dict.find(key);
+    auto it = m_dict.find(key);
     if (it != m_dict.end())
     {
         data = it->second;

@@ -26,7 +26,9 @@
 
 #include <ns3/object.h>
 #include <ns3/type-name.h>
+
 #include <cstdint>
+#include <numeric>
 
 namespace ns3
 {
@@ -39,7 +41,7 @@ class OpenGymDataContainer : public Object
 
     static TypeId GetTypeId();
 
-    virtual ns3_ai_gym::DataContainer GetDataContainerPbMsg() = 0;
+    virtual ns3_ai_gym::DataContainer GetDataContainerPbMsg() const = 0;
     static Ptr<OpenGymDataContainer> CreateFromDataContainerPbMsg(
         ns3_ai_gym::DataContainer& dataContainer);
 
@@ -66,7 +68,7 @@ class OpenGymDiscreteContainer : public OpenGymDataContainer
 
     static TypeId GetTypeId();
 
-    ns3_ai_gym::DataContainer GetDataContainerPbMsg() override;
+    ns3_ai_gym::DataContainer GetDataContainerPbMsg() const override;
 
     void Print(std::ostream& where) const override;
 
@@ -98,7 +100,7 @@ class OpenGymBoxContainer : public OpenGymDataContainer
 
     static TypeId GetTypeId();
 
-    ns3_ai_gym::DataContainer GetDataContainerPbMsg() override;
+    ns3_ai_gym::DataContainer GetDataContainerPbMsg() const override;
 
     void Print(std::ostream& where) const override;
 
@@ -107,14 +109,16 @@ class OpenGymBoxContainer : public OpenGymDataContainer
         container->Print(os);
         return os;
     }
+
     void SetValue(uint32_t idx, T value);
     bool AddValue(T value);
     T GetValue(uint32_t idx);
 
     bool SetData(std::vector<T> data);
-    std::vector<T> GetData();
+    std::vector<T> GetData() const;
 
-    std::vector<uint32_t> GetShape();
+    std::vector<uint32_t> GetShape() const;
+    void Reshape(const std::vector<uint32_t>& shape);
 
   protected:
     // Inherited
@@ -187,6 +191,14 @@ OpenGymBoxContainer<T>::SetDtype()
 
 template <typename T>
 void
+OpenGymBoxContainer<T>::Reshape(const std::vector<uint32_t>& shape)
+{
+    m_shape = shape;
+    m_data.resize(std::accumulate(shape.cbegin(), shape.cend(), 1, std::multiplies<uint32_t>{}), 0);
+}
+
+template <typename T>
+void
 OpenGymBoxContainer<T>::DoDispose()
 {
 }
@@ -199,7 +211,7 @@ OpenGymBoxContainer<T>::DoInitialize()
 
 template <typename T>
 ns3_ai_gym::DataContainer
-OpenGymBoxContainer<T>::GetDataContainerPbMsg()
+OpenGymBoxContainer<T>::GetDataContainerPbMsg() const
 {
     ns3_ai_gym::DataContainer dataContainerPbMsg;
     ns3_ai_gym::BoxDataContainer boxContainerPbMsg;
@@ -276,14 +288,14 @@ OpenGymBoxContainer<T>::SetData(std::vector<T> data)
 
 template <typename T>
 std::vector<uint32_t>
-OpenGymBoxContainer<T>::GetShape()
+OpenGymBoxContainer<T>::GetShape() const
 {
     return m_shape;
 }
 
 template <typename T>
 std::vector<T>
-OpenGymBoxContainer<T>::GetData()
+OpenGymBoxContainer<T>::GetData() const
 {
     return m_data;
 }
@@ -314,7 +326,7 @@ class OpenGymTupleContainer : public OpenGymDataContainer
 
     static TypeId GetTypeId();
 
-    ns3_ai_gym::DataContainer GetDataContainerPbMsg() override;
+    ns3_ai_gym::DataContainer GetDataContainerPbMsg() const override;
 
     void Print(std::ostream& where) const override;
 
@@ -325,7 +337,7 @@ class OpenGymTupleContainer : public OpenGymDataContainer
     }
 
     bool Add(Ptr<OpenGymDataContainer> space);
-    Ptr<OpenGymDataContainer> Get(uint32_t idx);
+    Ptr<OpenGymDataContainer> Get(uint32_t idx) const;
     bool Set(uint32_t idx, Ptr<OpenGymDataContainer> value);
 
   protected:
@@ -344,11 +356,11 @@ class OpenGymDictContainer : public OpenGymDataContainer
 
     static TypeId GetTypeId();
 
-    ns3_ai_gym::DataContainer GetDataContainerPbMsg() override;
+    ns3_ai_gym::DataContainer GetDataContainerPbMsg() const override;
 
     void Print(std::ostream& where) const override;
 
-    std::vector<std::string> GetKeys();
+    std::vector<std::string> GetKeys() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Ptr<OpenGymDictContainer> container)
     {
@@ -358,7 +370,7 @@ class OpenGymDictContainer : public OpenGymDataContainer
 
     bool Add(std::string key, Ptr<OpenGymDataContainer> value);
     bool Set(std::string key, Ptr<OpenGymDataContainer> value);
-    Ptr<OpenGymDataContainer> Get(std::string key);
+    Ptr<OpenGymDataContainer> Get(std::string key) const;
 
   protected:
     // Inherited

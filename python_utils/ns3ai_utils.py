@@ -48,11 +48,12 @@ def run_single_ns3(
     env=None,
     show_output=False,
     debug=False,
+    simulation_wd: Path | None = None,
 ):
     if env is None:
         env = {}
     env.update(os.environ)
-    env["LD_LIBRARY_PATH"] = os.path.abspath(os.path.join(path, "build", "lib"))
+    env["LD_LIBRARY_PATH"] = os.path.abspath(os.path.join(path, "lib"))
     if Path(pname).is_file():
         cmd = pname
     else:
@@ -63,7 +64,15 @@ def run_single_ns3(
     if debug:
         cmd = f"sleep infinity && {cmd}"
     if show_output:
-        proc = subprocess.Popen(cmd, shell=True, text=True, env=env, stdin=subprocess.PIPE, preexec_fn=os.setpgrp)
+        proc = subprocess.Popen(
+            cmd,
+            shell=True,
+            text=True,
+            env=env,
+            stdin=subprocess.PIPE,
+            preexec_fn=os.setpgrp,
+            cwd=simulation_wd,
+        )
     else:
         proc = subprocess.Popen(
             cmd,
@@ -74,6 +83,7 @@ def run_single_ns3(
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             preexec_fn=os.setpgrp,
+            cwd=simulation_wd,
         )
 
     return cmd, proc
@@ -133,13 +143,13 @@ class Experiment:
         cpp2pyMsgName="My Cpp to Python Msg",
         py2cppMsgName="My Python to Cpp Msg",
         lockableName="My Lockable",
+        simulation_wd: Path | None = None,
     ):
         if self._created:
             raise Exception('ns3ai_utils: Error: Experiment is singleton')
         self._created = True
         self.targetName = targetName  # ns-3 target name or file name
         self.debug = debug
-        os.chdir(ns3Path)
         self.msgModule = msgModule
         self.handleFinish = handleFinish
         self.useVector = useVector
@@ -149,6 +159,7 @@ class Experiment:
         self.cpp2pyMsgName = cpp2pyMsgName
         self.py2cppMsgName = py2cppMsgName
         self.lockableName = lockableName
+        self.simulation_wd = simulation_wd
 
         self.msgInterface = msgModule.Ns3AiMsgInterfaceImpl(
             True, self.useVector, self.handleFinish,
@@ -180,6 +191,7 @@ class Experiment:
             setting=setting,
             show_output=show_output,
             debug=self.debug,
+            simulation_wd=self.simulation_wd,
         )
         logger.info("ns3ai_utils: Running ns-3 with: %s", self.simCmd)
         # exit if an early error occurred, such as wrong target name

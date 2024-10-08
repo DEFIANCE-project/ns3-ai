@@ -71,7 +71,8 @@ OpenGymMultiAgentInterface::Init()
     // send init msg to python
     msgInterface->CppSendBegin();
     msgInterface->GetCpp2PyStruct()->size = simInitMsg.ByteSizeLong();
-    assert(msgInterface->GetCpp2PyStruct()->size <= MSG_BUFFER_SIZE);
+    NS_ABORT_MSG_IF(msgInterface->GetCpp2PyStruct()->size > MSG_BUFFER_SIZE,
+                    "Increase buffer size to " << msgInterface->GetCpp2PyStruct()->size);
     simInitMsg.SerializeToArray(msgInterface->GetCpp2PyStruct()->buffer,
                                 msgInterface->GetCpp2PyStruct()->size);
     msgInterface->CppSendEnd();
@@ -153,7 +154,8 @@ OpenGymMultiAgentInterface::NotifyCurrentState(
     // send env state msg to python
     msgInterface->CppSendBegin();
     msgInterface->GetCpp2PyStruct()->size = envStateMsg.ByteSizeLong();
-    assert(msgInterface->GetCpp2PyStruct()->size <= MSG_BUFFER_SIZE);
+    NS_ABORT_MSG_IF(msgInterface->GetCpp2PyStruct()->size > MSG_BUFFER_SIZE,
+                    "Increase buffer size to " << msgInterface->GetCpp2PyStruct()->size);
     envStateMsg.SerializeToArray(msgInterface->GetCpp2PyStruct()->buffer,
                                  msgInterface->GetCpp2PyStruct()->size);
 

@@ -22,4 +22,7 @@ setup(
     name="ns3ai_gym_env",
     version="0.0.1",
     install_requires=["numpy", "gymnasium", "protobuf==3.20.3"],
+    packages=["messages_pb2", "ns3ai_gym_msg_py", "ns3ai_gym_env"],
+    package_dir={"ns3ai_gym_msg_py": "ns3ai_gym_msg_py"},
+    package_data={"ns3ai_gym_msg_py": ["*.so"]},
 )

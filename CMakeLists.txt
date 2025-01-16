@@ -102,7 +102,7 @@ protobuf_generate(
         TARGET proto-objects
         IMPORT_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/model/gym-interface"
         LANGUAGE python
-        PROTOC_OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/model/gym-interface/py"
+        PROTOC_OUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/model/gym-interface/py/messages_pb2"
 )
 add_dependencies(${libai} proto-objects)
 

@@ -129,10 +129,7 @@ class Experiment:
         useVector=False,
         vectorSize=None,
         shmSize=4096,
-        segName="My Seg",
-        cpp2pyMsgName="My Cpp to Python Msg",
-        py2cppMsgName="My Python to Cpp Msg",
-        lockableName="My Lockable",
+        segName: str = "ns3-ai",
     ):
         if self._created:
             raise Exception('ns3ai_utils: Error: Experiment is singleton')
@@ -146,13 +143,16 @@ class Experiment:
         self.vectorSize = vectorSize
         self.shmSize = shmSize
         self.segName = segName
-        self.cpp2pyMsgName = cpp2pyMsgName
-        self.py2cppMsgName = py2cppMsgName
-        self.lockableName = lockableName
 
         self.msgInterface = msgModule.Ns3AiMsgInterfaceImpl(
-            True, self.useVector, self.handleFinish,
-            self.shmSize, self.segName, self.cpp2pyMsgName, self.py2cppMsgName, self.lockableName
+            True,
+            self.useVector,
+            self.handleFinish,
+            self.shmSize,
+            self.segName,
+            segName + "2py",
+            segName + "2cpp",
+            segName + "lock",
         )
         if self.useVector:
             if self.vectorSize is None:

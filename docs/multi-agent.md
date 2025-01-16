@@ -597,10 +597,7 @@ cmd.AddValue("trial_name", "name of the trial", trial_name);
 cmd.Parse(argc, argv);
 
 OpenGymMultiAgentInterface::Get();
-Ns3AiMsgInterface::Get()->SetNames("My Seg" + trial_name,
-                                   "My Cpp to Python Msg" + trial_name,
-                                   "My Python to Cpp Msg" + trial_name,
-                                   "My Lockable" + trial_name);
+Ns3AiMsgInterface::Get()->SetTrialName(trial_name);
 ```
 
 >[!NOTE]

@@ -285,10 +285,7 @@ class Ns3Env(gym.Env):
         ns3Settings: dict[str, Any] | None = None,
         debug: bool = False,
         shmSize=4096,
-        segName="My Seg",  # the names for the shared memory segments used by boost
-        cpp2pyMsgName="My Cpp to Python Msg",
-        py2cppMsgName="My Python to Cpp Msg",
-        lockableName="My Lockable",
+        segName="ns3-ai",  # the names for the shared memory segments used by boost
         trial_name: str | None = None,
     ):
         if self._created:
@@ -298,13 +295,12 @@ class Ns3Env(gym.Env):
         self.shmSize = shmSize
         self._created = True
         self.ns3Settings = ns3Settings
+        self.ns3Path = ns3Path
+        self.trial_name = trial_name
         if trial_name is not None:
             # indexing the memory segments with the trial name to allow parallel execution of ns3 environments
             self.ns3Settings["trial_name"] = trial_name # add trial name to the command line arguments so the ns3 process can use it
-            segName = segName + trial_name
-            cpp2pyMsgName = cpp2pyMsgName + trial_name
-            py2cppMsgName = py2cppMsgName + trial_name
-            lockableName = lockableName + trial_name
+            segName = segName + "_" + trial_name
 
         self.exp = Experiment(
             targetName,
@@ -313,9 +309,6 @@ class Ns3Env(gym.Env):
             debug=debug,
             shmSize=shmSize,
             segName=segName,
-            cpp2pyMsgName=cpp2pyMsgName,
-            py2cppMsgName=py2cppMsgName,
-            lockableName=lockableName,
         )
         
         self.newStateRx = False
@@ -392,10 +385,11 @@ class Ns3Env(gym.Env):
     def __getstate__(self):
         return {
             "targetName": self.targetName,
-            "ns3Path": ".",
+            "ns3Path": self.ns3Path,
             "ns3Settings": self.ns3Settings,
             "debug": self.debug,
             "shmSize": self.shmSize,
+            "trial_name": self.trial_name
         }
 
     def __setstate__(self, state):

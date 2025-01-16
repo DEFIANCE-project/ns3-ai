@@ -24,11 +24,8 @@
 
 #include <ns3/singleton.h>
 
-#include <cstddef>
 #include <cstdint>
-#include <iostream>
 #include <string>
-#include <vector>
 #include <boost/interprocess/allocators/allocator.hpp>
 #include <boost/interprocess/containers/vector.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
@@ -350,15 +347,10 @@ class Ns3AiMsgInterface : public Singleton<Ns3AiMsgInterface>
      * documentation for details. Normally the default
      * names are OK.
      */
-    void SetNames(std::string segmentName,
-                  std::string cpp2pyMsgName,
-                  std::string py2cppMsgName,
-                  std::string lockableName)
+    void SetTrialName(std::string segmentName)
     {
-        this->m_segmentName = segmentName;
-        this->m_cpp2pyMsgName = cpp2pyMsgName;
-        this->m_py2cppMsgName = py2cppMsgName;
-        this->m_lockableName = lockableName;
+        m_segmentName += "_";
+        m_segmentName += segmentName;
     };
 
     /**
@@ -374,9 +366,9 @@ class Ns3AiMsgInterface : public Singleton<Ns3AiMsgInterface>
             this->m_handleFinish,
             this->m_size,
             this->m_segmentName.c_str(),
-            this->m_cpp2pyMsgName.c_str(),
-            this->m_py2cppMsgName.c_str(),
-            this->m_lockableName.c_str());
+            (this->m_segmentName + "2py").c_str(),
+            (this->m_segmentName + "2cpp").c_str(),
+            (this->m_segmentName + "lock").c_str());
         return &interface;
     };
 
@@ -385,10 +377,7 @@ class Ns3AiMsgInterface : public Singleton<Ns3AiMsgInterface>
     bool m_useVector;
     bool m_handleFinish;
     uint32_t m_size = 4096;
-    std::string m_segmentName = "My Seg";
-    std::string m_cpp2pyMsgName = "My Cpp to Python Msg";
-    std::string m_py2cppMsgName = "My Python to Cpp Msg";
-    std::string m_lockableName = "My Lockable";
+    std::string m_segmentName = "ns3-ai";
 };
 
 } // namespace ns3

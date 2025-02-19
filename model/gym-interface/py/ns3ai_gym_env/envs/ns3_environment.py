@@ -286,7 +286,7 @@ class Ns3Env(gym.Env):
         debug: bool = False,
         shmSize=4096,
         segName="ns3-ai",  # the names for the shared memory segments used by boost
-        trial_name: str | None = None,
+        trial_name: str = "single_trial",
     ):
         if self._created:
             raise Exception('Error: Ns3Env is singleton')
@@ -297,10 +297,9 @@ class Ns3Env(gym.Env):
         self.ns3Settings = ns3Settings
         self.ns3Path = ns3Path
         self.trial_name = trial_name
-        if trial_name is not None:
-            # indexing the memory segments with the trial name to allow parallel execution of ns3 environments
-            self.ns3Settings["trial_name"] = trial_name # add trial name to the command line arguments so the ns3 process can use it
-            segName = segName + "_" + trial_name
+        # indexing the memory segments with the trial name to allow parallel execution of ns3 environments
+        self.ns3Settings["trial_name"] = trial_name
+        segName = segName + "_" + trial_name
 
         self.exp = Experiment(
             targetName,

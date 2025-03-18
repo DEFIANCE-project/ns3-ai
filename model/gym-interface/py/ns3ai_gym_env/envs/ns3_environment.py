@@ -286,7 +286,7 @@ class Ns3Env(gym.Env):
         debug: bool = False,
         shmSize=4096,
         segName="ns3-ai",  # the names for the shared memory segments used by boost
-        trial_name: str = "single_trial",
+        trial_name: str | None = "single_trial",
     ):
         if self._created:
             raise Exception('Error: Ns3Env is singleton')
@@ -297,9 +297,9 @@ class Ns3Env(gym.Env):
         self.ns3Settings = ns3Settings
         self.ns3Path = ns3Path
         self.trial_name = trial_name
-        # indexing the memory segments with the trial name to allow parallel execution of ns3 environments
-        self.ns3Settings["trial_name"] = trial_name
-        segName = segName + "_" + trial_name
+        if trial_name:  # indexing the memory segments with the trial name to allow parallel execution of ns3 environments
+            self.ns3Settings["trial_name"] = trial_name
+            segName = segName + "_" + trial_name
 
         self.exp = Experiment(
             targetName,
@@ -309,7 +309,7 @@ class Ns3Env(gym.Env):
             shmSize=shmSize,
             segName=segName,
         )
-        
+
         self.newStateRx = False
         self.obsData = None
         self.reward = 0
@@ -348,11 +348,11 @@ class Ns3Env(gym.Env):
         self.gameOver = False
         self.gameOverReason = None
         self.extraInfo = None
-        
+
         # Allow the user to increment the run number on environment reset. This way the random variables used inside the simulation will use different values. This is required for reproducibility and to avoid overfitting.
         if "runId" in self.ns3Settings:
             self.ns3Settings["runId"] = int(self.ns3Settings["runId"]) + 1
-            
+
         self.msgInterface = self.exp.run(setting=self.ns3Settings, show_output=True)
         self.initialize_env()
         # get first observations
@@ -388,7 +388,7 @@ class Ns3Env(gym.Env):
             "ns3Settings": self.ns3Settings,
             "debug": self.debug,
             "shmSize": self.shmSize,
-            "trial_name": self.trial_name
+            "trial_name": self.trial_name,
         }
 
     def __setstate__(self, state):

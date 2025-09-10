@@ -80,24 +80,19 @@ def run_single_ns3(
 
 
 # used to kill the ns-3 script process and its child processes
-def kill_proc_tree(p, timeout=None, on_terminate=None):
+def kill_proc_tree(p: subprocess.Popen, timeout: int = 1):
     logger.info('ns3ai_utils: Killing subprocesses...')
-    if isinstance(p, int):
-        p = psutil.Process(p)
-    elif not isinstance(p, psutil.Process):
-        p = psutil.Process(p.pid)
-    ch = [p]+p.children(recursive=True)
+    p = psutil.Process(p.pid)
+    ch = p.children(recursive=True) + [p]
     for c in ch:
         try:
             # print("\t-- {}, pid={}, ppid={}".format(psutil.Process(c.pid).name(), c.pid, c.ppid()))
             # print("\t   \"{}\"".format(" ".join(c.cmdline())))
             c.kill()
-        except Exception as e:
+            c.wait(timeout=timeout)
+        except Exception:
             continue
-    succ, err = psutil.wait_procs(ch, timeout=timeout,
-                                  callback=on_terminate)
-    return succ, err
-
+    
 
 # According to Python signal docs, after a signal is received, the
 # low-level signal handler sets a flag which tells the virtual machine

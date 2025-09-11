@@ -15,8 +15,8 @@ T = TypeVar("T")
 class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
     @copy_signature_from(Ns3Env.__init__)
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        self.action_space: spaces.Dict = spaces.Dict()
-        self.observation_space: spaces.Dict = spaces.Dict()
+        self.action_spaces: spaces.Dict = spaces.Dict()
+        self.observation_spaces: spaces.Dict = spaces.Dict()
         self.agent_selection: str | None = None
         super().__init__(*args, **kwargs)
         MultiAgentEnv.__init__(self)
@@ -29,11 +29,11 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
         self.msgInterface.PyRecvEnd()
 
         for agent, space in init_msg.actSpaces.items():
-            self.action_space[agent] = self._create_space(space)
+            self.action_spaces[agent] = self._create_space(space)
 
         for agent, space in init_msg.obsSpaces.items():
-            self.observation_space[agent] = self._create_space(space)
-        self._agent_ids = list(self.action_space.keys())
+            self.observation_spaces[agent] = self._create_space(space)
+        self._agent_ids = list(self.action_spaces.keys())
         reply = pb.SimInitAck()
         reply.done = True
         reply.stopSimReq = False
@@ -73,7 +73,7 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
         assert self.agent_selection
         reply = pb.EnvActMsg()
 
-        action_msg = self._pack_data(actions[self.agent_selection], self.action_space[self.agent_selection])
+        action_msg = self._pack_data(actions[self.agent_selection], self.action_spaces[self.agent_selection])
         reply.actData.CopyFrom(action_msg)
 
         reply_msg = reply.SerializeToString()
@@ -110,4 +110,4 @@ class Ns3MultiAgentEnv(Ns3Env, MultiAgentEnv):
 
     def get_random_action(self) -> Any:
         assert self.agent_selection is not None
-        return self.action_space[self.agent_selection].sample()
+        return self.action_spaces[self.agent_selection].sample()

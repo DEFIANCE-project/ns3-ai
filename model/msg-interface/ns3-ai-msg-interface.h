@@ -347,10 +347,9 @@ class Ns3AiMsgInterface : public Singleton<Ns3AiMsgInterface>
      * documentation for details. Normally the default
      * names are OK.
      */
-    void SetTrialName(std::string segmentName)
+    void SetTrialName(std::string trialName)
     {
-        m_segmentName += "_";
-        m_segmentName += segmentName;
+        m_trailName = trialName;
     };
 
     /**
@@ -365,10 +364,10 @@ class Ns3AiMsgInterface : public Singleton<Ns3AiMsgInterface>
             this->m_useVector,
             this->m_handleFinish,
             this->m_size,
-            this->m_segmentName.c_str(),
-            (this->m_segmentName + "2py").c_str(),
-            (this->m_segmentName + "2cpp").c_str(),
-            (this->m_segmentName + "lock").c_str());
+            this->BuildSegmentName().c_str(),
+            (this->BuildSegmentName() + "2py").c_str(),
+            (this->BuildSegmentName() + "2cpp").c_str(),
+            (this->BuildSegmentName() + "lock").c_str());
         return &interface;
     };
 
@@ -377,7 +376,12 @@ class Ns3AiMsgInterface : public Singleton<Ns3AiMsgInterface>
     bool m_useVector;
     bool m_handleFinish;
     uint32_t m_size = 4096;
-    std::string m_segmentName = "ns3-ai";
+    std::string m_trailName = "single_trial";
+
+    std::string BuildSegmentName() const {
+        std::string segmentName = "ns3-ai";
+        return segmentName + "_" + m_trailName;
+    }
 };
 
 } // namespace ns3

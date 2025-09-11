@@ -73,7 +73,7 @@
 #include "ns3/traffic-control-layer.h"
 #include "ns3/udp-client-server-helper.h"
 #include "ns3/uinteger.h"
-#include "ns3/v4ping-helper.h"
+// #include "ns3/v4ping-helper.h"
 #include "ns3/wifi-acknowledgment.h"
 #include "ns3/wifi-mac-queue.h"
 #include "ns3/wifi-net-device.h"
@@ -1845,7 +1845,7 @@ main(int argc, char* argv[])
     {
         // std::cout << "Datarate: " << HePhy::GetDataRate(i, channelWidths, guardIntervalNs, 1)
         //           << std::endl;
-        dataRateToMcs[HePhy::GetDataRate(i, channelWidths, guardIntervalNs, 1)] = i;
+        dataRateToMcs[HePhy::GetDataRate(i, channelWidths, NanoSeconds(guardIntervalNs), 1)] = i;
     }
 
     if (phyMode != "OfdmRate54Mbps")

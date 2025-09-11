@@ -1,6 +1,6 @@
 # ns3-ai Installation
 
-This installation works on Ubuntu 22.04 and macOS 13.0 or higher.
+This installation works on Ubuntu 22.04 and macOS 15.0 or higher.
 
 ## Requirements
 
@@ -13,10 +13,14 @@ This installation works on Ubuntu 22.04 and macOS 13.0 or higher.
 3. pybind11
     - Ubuntu: `sudo apt install pybind11-dev`
     - macOS: `brew install pybind11`
+4. A Python virtual environment dedicated for ns3-ai (highly recommended)
+    - For example, to use conda to create an environment named `ns3ai_env` with python version 3.11: `conda create -n ns3ai_env python=3.11`.
 
 ## General Setup
 
-1. Clone this repository at `contrib/ai`
+1. If a Python virtual environment is used, activate it. The absolute path to the Python executable of this environment, denoted as `<path-to-python>`, will be later passed to cmake via `ns3` script. You can find the path by first activate it and then `which python`.
+
+2. Clone this repository at `contrib/ai`
 
 ```shell
 cd YOUR_NS3_DIRECTORY
@@ -26,23 +30,16 @@ git clone https://github.com/hust-diangroup/ns3-ai.git contrib/ai
 2. Configure and build the `ai` library
 
 ```shell
-./ns3 configure --enable-examples
+./ns3 configure --enable-examples -- -DPython_EXECUTABLE=<path-to-python> -DPython3_EXECUTABLE=<path-to-python>
 ./ns3 build ai
 ```
 
-3. Setup Python interfaces. It's recommended to use a separate Conda environment
-for ns3-ai.
+3. Setup Python interfaces.
 
 ```shell
 pip install -e contrib/ai/python_utils
 pip install -e contrib/ai/model/gym-interface/py
 ```
-
-- Note: In later build, Python bindings are generated with the Python library 
-found by Cmake, which is unlikely the Conda environment you are using.
-Please ensure that the Python version in your Conda environment is consistent 
-with the default Python version in your OS, so that the Python interpreter 
-can import the binding modules properly.
 
 4. Build the examples (optional)
 
@@ -50,7 +47,7 @@ All targets named `ns3ai_*` can be built separately.
 
 ```shell
 # build all examples in all versions
-./ns3 build ns3ai_apb_gym ns3ai_apb_msg_stru ns3ai_apb_msg_vec ns3ai_multibss ns3ai_rltcp_gym ns3ai_rltcp_msg ns3ai_ratecontrol_constant ns3ai_ratecontrol_ts ns3ai_ltecqi
+./ns3 build ns3ai_apb_gym ns3ai_apb_msg_stru ns3ai_apb_msg_vec ns3ai_multibss ns3ai_rltcp_gym ns3ai_rltcp_msg ns3ai_ratecontrol_constant ns3ai_ratecontrol_ts ns3ai_ltecqi_msg
 
 # build A-Plus-B example
 # with Gym interface

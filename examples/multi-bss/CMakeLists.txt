@@ -1,5 +1,9 @@
-
-add_subdirectory(vr-app)
+set(gsl_libraries)
+if(${GSL_FOUND})
+  set(gsl_libraries
+      ${GSL_LIBRARIES}
+  )
+endif()
 
 build_lib_example(
         NAME ns3ai_multibss

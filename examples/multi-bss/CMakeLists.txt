@@ -5,6 +5,11 @@ if(${GSL_FOUND})
   )
 endif()
 
+if (NOT libvr-app)
+  message(STATUS "multibss example disabled: vr-app not found")
+  return()
+endif()
+
 build_lib_example(
         NAME ns3ai_multibss
         SOURCE_FILES

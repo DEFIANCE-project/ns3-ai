@@ -26,9 +26,9 @@ the channel is clear, reducing the efficiency of network.
 In order to achieve the low delay and high bandwidth requirements for VR, DQN is used
 to learn from past experiences and choose the best CCA threshold for BSS1.
 
-The burst traffic generator is under [vr-app](./vr-app) directory. It is intended as a
-module providing ns-3 applications including `BurstyApplication` and `BurstSink`. See
-its documents for details.
+You need the burst traffic generator [vr-app](./vr-app). It is a module providing ns-3
+applications including `BurstyApplication` and `BurstSink`. See
+<https://github.com/signetlabdei/ns-3-vr-app> for details.
 
 ### Scenario
 

@@ -7,7 +7,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     add_compile_options("-Wno-gcc-compat")
 endif()
 
-find_package(Boost COMPONENTS program_options)
+find_package(Boost CONFIG COMPONENTS program_options)
 if(NOT Boost_FOUND)
     message(
       ${HIGHLIGHTED_STATUS}

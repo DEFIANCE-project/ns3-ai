@@ -49,7 +49,11 @@ if(NOT Protobuf_FOUND)
     return()
     endif()
 endif()
-include_directories(${Protobuf_INCLUDE_DIRS})
+
+# may be unset if Protobuf was found via find_package(Protobuf CONFIG)
+if (Protobuf_INCLUDE_DIRS)
+    include_directories(${Protobuf_INCLUDE_DIRS})
+endif()
 
 # Check if C++-based ML frameworks are available
 # Must do before build_lib (which adds examples/ subdirectory)
